@@ -4,7 +4,7 @@
 
 ## 準備
 
-- [] docker-compose.ymlを準備する
+- [x] docker-compose.ymlを準備する
 
 ## 入力
 
@@ -31,7 +31,8 @@
     - 標準SQLのデータ型に対応する
     - PostgreSQL固有のデータ型に対応する
     - MySQL固有のデータ型に対応する
-- [] build.rsの仕様を確認する
+- [x] build.rsの仕様を確認する
+    - build.rsは利用しない方針
 
 ## その他
 
