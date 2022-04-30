@@ -1,3 +1,6 @@
+mod entity;
+
+use entity::user::User;
 use sqlx::{postgres::PgPoolOptions, types::Uuid, PgPool};
 
 #[tokio::main]
@@ -23,12 +26,6 @@ async fn main() -> Result<(), sqlx::Error> {
     assert_eq!(user.name, user2.name);
     println!("{:?}", user2);
     Ok(())
-}
-
-#[derive(sqlx::FromRow, Debug)]
-pub struct User {
-    id: Uuid,
-    name: String,
 }
 
 async fn insert(pool: &PgPool, user: &User) -> Result<(), sqlx::Error> {
