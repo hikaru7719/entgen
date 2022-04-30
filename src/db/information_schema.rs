@@ -1,3 +1,7 @@
+use sqlx::{postgres::PgPoolOptions, PgPool};
+
+use crate::config;
+
 #[derive(sqlx::FromRow, Debug)]
 pub struct Tables {
     pub table_catalog: String,
@@ -60,4 +64,34 @@ pub struct Columns {
     pub is_generated: String,
     pub generation_expression: String,
     pub is_updatable: String,
+}
+
+#[derive(Debug)]
+pub enum DBError {
+    ConnectionError(Box<dyn std::error::Error>),
+}
+
+pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> {
+    let db_url = format!(
+        "postgres://{}:{}@{}:{}/{}",
+        config.user, config.password, config.host, config.port, config.db
+    );
+    PgPoolOptions::new()
+        .connect(db_url.as_str())
+        .await
+        .or_else(|err| Err(DBError::ConnectionError(err.into())))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_connect() {
+        let config = config::new_postgres_config_for_test().unwrap();
+        let conn = connect(config).await.unwrap();
+        assert_eq!(conn.is_closed(), false);
+        conn.close().await;
+        assert_eq!(conn.is_closed(), true);
+    }
 }
