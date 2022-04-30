@@ -20,6 +20,7 @@ pub struct PostgresConfig {
 pub enum ConfigError {
     FilePathError(Box<dyn std::error::Error>),
     FileParseError(Box<dyn std::error::Error>),
+    EnvError(Box<dyn std::error::Error>),
 }
 
 pub fn new(path: String) -> Result<Config, ConfigError> {
@@ -31,16 +32,37 @@ pub fn new(path: String) -> Result<Config, ConfigError> {
         });
 }
 
+pub fn new_postgres_config_for_test() -> Result<PostgresConfig, ConfigError> {
+    envy::prefixed("POSTGRES_")
+        .from_env::<PostgresConfig>()
+        .or_else(|err| Err(ConfigError::EnvError(Box::new(err))))
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     #[test]
-    fn test_config_new() {
+    fn test_new() {
         let config = new("test_config.toml".to_string()).unwrap();
         assert_eq!(config.postgres.user, "testuser".to_string());
         assert_eq!(config.postgres.password, "testpassword".to_string());
         assert_eq!(config.postgres.host, "testhost".to_string());
         assert_eq!(config.postgres.port, 5432);
         assert_eq!(config.postgres.db, "testdb".to_string());
+    }
+
+    #[test]
+    fn test_new_postgres_config_for_test() {
+        std::env::set_var("POSTGRES_USER", "testuser");
+        std::env::set_var("POSTGRES_PASSWORD", "testpassword");
+        std::env::set_var("POSTGRES_HOST", "testhost");
+        std::env::set_var("POSTGRES_PORT", "5432");
+        std::env::set_var("POSTGRES_DB", "testdb");
+        let config = new_postgres_config_for_test().unwrap();
+        assert_eq!(config.user, "testuser".to_string());
+        assert_eq!(config.password, "testpassword".to_string());
+        assert_eq!(config.host, "testhost".to_string());
+        assert_eq!(config.port, 5432);
+        assert_eq!(config.db, "testdb".to_string());
     }
 }
