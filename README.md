@@ -19,6 +19,27 @@
 - [ ] information_schemaからデータを取得する
 - [ ] 中間データ構造を確定する
 
+## information_schema
+
+ユーザ定義テーブル一覧
+
+```
+SELECT * FORM information_schema.tables WHERE table_schema = 'public';
+```
+
+テーブルカラム情報一覧
+
+```
+SELECT                                    
+    *
+FROM
+    information_schema.columns
+WHERE
+    table_name = <テーブル名>
+ORDER BY
+        ordinal_position;
+```
+
 ## 出力
 
 - [ ] 出力のデータ構造を確定する
@@ -38,3 +59,5 @@
 
 - [ ] エラーハンドリングの方針を決定する
 - [ ] ログ出力の方針を決定する
+
+
