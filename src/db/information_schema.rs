@@ -1,5 +1,5 @@
 #[derive(sqlx::FromRow, Debug)]
-pub struct tables {
+pub struct Tables {
     table_catalog: String,
     table_schema: String,
     table_name: String,
@@ -15,7 +15,7 @@ pub struct tables {
 }
 
 #[derive(sqlx::FromRow, Debug)]
-pub struct columns {
+pub struct Columns {
     table_catalog: String,
     table_schema: String,
     table_name: String,
