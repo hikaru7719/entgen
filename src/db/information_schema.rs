@@ -8,8 +8,8 @@ pub struct Tables {
     pub table_schema: String,
     pub table_name: String,
     pub table_type: String,
-    pub self_referencing_column_name: String,
-    pub reference_generation: String,
+    pub self_referencing_column_name: Option<String>,
+    pub reference_generation: Option<String>,
     pub user_defined_type_catalog: String,
     pub user_defined_type_schema: String,
     pub user_defined_type_name: String,
@@ -69,6 +69,7 @@ pub struct Columns {
 #[derive(Debug)]
 pub enum DBError {
     ConnectionError(Box<dyn std::error::Error>),
+    QueryError(Box<dyn std::error::Error>),
 }
 
 pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> {
@@ -86,6 +87,23 @@ pub async fn close(pool: &PgPool) {
     pool.close().await;
 }
 
+pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, DBError> {
+    let rs = sqlx::query_as::<_, Tables>(
+        "SELECT * FROM information_schema.tables WHERE table_schema = 'public'",
+    )
+    .fetch_all(pool)
+    .await;
+
+    return rs
+        .and_then(|tables| {
+            return Ok(tables
+                .iter()
+                .map(|tbl| tbl.table_name.clone())
+                .collect::<Vec<String>>());
+        })
+        .or_else(|err| Err(DBError::QueryError(err.into())));
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -97,5 +115,13 @@ mod test {
         assert_eq!(pool.is_closed(), false);
         close(&pool).await;
         assert_eq!(pool.is_closed(), true);
+    }
+
+    #[tokio::test]
+    async fn test_fetch_user_defined_tables() {
+        let config = config::new_postgres_config_for_test().unwrap();
+        let pool = connect(config).await.unwrap();
+        let tables = fetch_user_defined_tables(&pool).await.unwrap();
+        assert_eq!(vec!["users"], tables);
     }
 }
