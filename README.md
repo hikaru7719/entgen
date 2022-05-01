@@ -19,7 +19,7 @@
 - [ ] 必要なデータを取得する
 - [x] information_schemaテーブルの項目を確認する
 - [x] information_schemaからデータを取得する
-- [ ] 中間データ構造を確定する
+- [x] 中間データ構造を確定する
 
 ## information_schema
 
