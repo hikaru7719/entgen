@@ -1,9 +1,8 @@
-use std::fs;
+use std::{fs, path::Path};
 
 use serde_derive::Deserialize;
-
 #[derive(Debug, Deserialize)]
-pub struct Config {
+pub struct Setting {
     pub postgres: PostgresConfig,
 }
 
@@ -23,16 +22,18 @@ pub enum ConfigError {
     EnvError(Box<dyn std::error::Error>),
 }
 
-pub fn new(path: String) -> Result<Config, ConfigError> {
+pub fn new(path: String) -> Result<Setting, ConfigError> {
     return fs::read_to_string(path)
         .or_else(|err| Err(ConfigError::FilePathError(Box::new(err))))
         .and_then(|path| {
-            toml::from_str::<Config>(path.as_str())
+            toml::from_str::<Setting>(path.as_str())
                 .or_else(|err| Err(ConfigError::FileParseError(Box::new(err))))
         });
 }
 
 pub fn new_postgres_config_for_test() -> Result<PostgresConfig, ConfigError> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(".env");
+    dotenv::from_path(path).ok();
     envy::prefixed("POSTGRES_")
         .from_env::<PostgresConfig>()
         .or_else(|err| Err(ConfigError::EnvError(Box::new(err))))
