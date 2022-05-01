@@ -24,45 +24,45 @@ pub struct Columns {
     pub table_schema: String,
     pub table_name: String,
     pub column_name: String,
-    pub ordinal_position: String,
-    pub column_default: String,
+    pub ordinal_position: i32,
+    pub column_default: Option<String>,
     pub is_nullable: String,
     pub data_type: String,
-    pub character_maximum_length: i64,
-    pub character_octet_length: i64,
-    pub numeric_precision: i64,
-    pub numeric_precision_radix: i64,
-    pub numeric_scale: i64,
-    pub datetime_precision: i64,
-    pub interval_type: String,
-    pub interval_precision: String,
-    pub character_set_catalog: String,
-    pub character_set_schema: String,
-    pub character_set_name: String,
-    pub collation_catalog: String,
-    pub collation_schema: String,
-    pub collation_name: String,
-    pub domain_catalog: String,
-    pub domain_schema: String,
-    pub domain_name: String,
+    pub character_maximum_length: Option<i32>,
+    pub character_octet_length: Option<i32>,
+    pub numeric_precision: Option<i32>,
+    pub numeric_precision_radix: Option<i32>,
+    pub numeric_scale: Option<i32>,
+    pub datetime_precision: Option<i32>,
+    pub interval_type: Option<String>,
+    pub interval_precision: Option<String>,
+    pub character_set_catalog: Option<String>,
+    pub character_set_schema: Option<String>,
+    pub character_set_name: Option<String>,
+    pub collation_catalog: Option<String>,
+    pub collation_schema: Option<String>,
+    pub collation_name: Option<String>,
+    pub domain_catalog: Option<String>,
+    pub domain_schema: Option<String>,
+    pub domain_name: Option<String>,
     pub udt_catalog: String,
     pub udt_schema: String,
     pub udt_name: String,
-    pub scope_catalog: String,
-    pub scope_schema: String,
-    pub scope_name: String,
-    pub maximum_cardinality: String,
+    pub scope_catalog: Option<String>,
+    pub scope_schema: Option<String>,
+    pub scope_name: Option<String>,
+    pub maximum_cardinality: Option<String>,
     pub dtd_identifier: String,
     pub is_self_referencing: String,
     pub is_identity: String,
-    pub identity_generation: String,
-    pub identity_start: String,
-    pub identity_increment: String,
-    pub identity_maximum: String,
-    pub identity_minimum: String,
-    pub identity_cycle: String,
+    pub identity_generation: Option<String>,
+    pub identity_start: Option<String>,
+    pub identity_increment: Option<String>,
+    pub identity_maximum: Option<String>,
+    pub identity_minimum: Option<String>,
+    pub identity_cycle: Option<String>,
     pub is_generated: String,
-    pub generation_expression: String,
+    pub generation_expression: Option<String>,
     pub is_updatable: String,
 }
 
@@ -104,6 +104,19 @@ pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, DBE
         .or_else(|err| Err(DBError::QueryError(err.into())));
 }
 
+pub async fn fetch_column_definition(
+    pool: &PgPool,
+    table_name: String,
+) -> Result<Vec<Columns>, DBError> {
+    sqlx::query_as::<_, Columns>(
+        "SELECT * FROM information_schema.columns WHERE table_name = $1 ORDER BY ordinal_position",
+    )
+    .bind(table_name)
+    .fetch_all(pool)
+    .await
+    .or_else(|err| Err(DBError::QueryError(err.into())))
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -123,5 +136,15 @@ mod test {
         let pool = connect(config).await.unwrap();
         let tables = fetch_user_defined_tables(&pool).await.unwrap();
         assert_eq!(vec!["users"], tables);
+    }
+
+    #[tokio::test]
+    async fn test_fetch_column_definition() {
+        let config = config::new_postgres_config_for_test().unwrap();
+        let pool = connect(config).await.unwrap();
+        let definitions = fetch_column_definition(&pool, "users".to_string())
+            .await
+            .unwrap();
+        assert_eq!("id".to_string(), definitions[0].column_name);
     }
 }
