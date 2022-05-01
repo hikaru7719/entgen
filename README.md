@@ -18,7 +18,7 @@
 - [ ] 必要なデータ項目を洗い出す
 - [ ] 必要なデータを取得する
 - [x] information_schemaテーブルの項目を確認する
-- [ ] information_schemaからデータを取得する
+- [x] information_schemaからデータを取得する
 - [ ] 中間データ構造を確定する
 
 ## information_schema
@@ -26,7 +26,7 @@
 ユーザ定義テーブル一覧
 
 ```
-SELECT * FORM information_schema.tables WHERE table_schema = 'public';
+SELECT * FROM information_schema.tables WHERE table_schema = 'public';
 ```
 
 テーブルカラム情報一覧
