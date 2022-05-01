@@ -82,6 +82,10 @@ pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> 
         .or_else(|err| Err(DBError::ConnectionError(err.into())))
 }
 
+pub async fn close(pool: &PgPool) {
+    pool.close().await;
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -89,9 +93,9 @@ mod test {
     #[tokio::test]
     async fn test_connect() {
         let config = config::new_postgres_config_for_test().unwrap();
-        let conn = connect(config).await.unwrap();
-        assert_eq!(conn.is_closed(), false);
-        conn.close().await;
-        assert_eq!(conn.is_closed(), true);
+        let pool = connect(config).await.unwrap();
+        assert_eq!(pool.is_closed(), false);
+        close(&pool).await;
+        assert_eq!(pool.is_closed(), true);
     }
 }
