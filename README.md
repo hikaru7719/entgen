@@ -37,9 +37,9 @@ SELECT
 FROM
     information_schema.columns
 WHERE
-    table_name = <テーブル名>
+    table_name = $1
 ORDER BY
-        ordinal_position;
+    ordinal_position;
 ```
 
 ## 出力
