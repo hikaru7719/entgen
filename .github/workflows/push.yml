@@ -12,9 +12,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_pass
-          POSTGRES_DB: test_db
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -26,14 +26,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Migration
-      run: psql -f db/init.sql postgres://test_user:test_pass@localhost:5432/test_db
+      run: psql -f db/init.sql postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/${{ secrets.POSTGRES_DB }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
       env:
-        POSTGRES_USER: test_user
-        POSTGRES_PASSWORD: test_pass
-        POSTGRES_DB: test_db
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
