@@ -1,6 +1,6 @@
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
-use crate::config;
+use crate::{config, db};
 
 #[derive(sqlx::FromRow, Debug)]
 pub struct Tables {
@@ -77,6 +77,7 @@ pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> 
         "postgres://{}:{}@{}:{}/{}",
         config.user, config.password, config.host, config.port, config.db
     );
+    println!("{}", db_url);
     PgPoolOptions::new()
         .connect(db_url.as_str())
         .await
