@@ -15,7 +15,7 @@ pub struct Tables {
     pub user_defined_type_name: Option<String>,
     pub is_insertable_into: String,
     pub is_typed: String,
-    pub commit_action: String,
+    pub commit_action: Option<String>,
 }
 
 #[derive(sqlx::FromRow, Debug)]
