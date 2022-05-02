@@ -1,6 +1,5 @@
-use std::{fs, path::Path};
-
 use serde_derive::Deserialize;
+use std::{fs, path::Path};
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub postgres: PostgresConfig,

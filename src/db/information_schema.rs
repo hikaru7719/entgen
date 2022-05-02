@@ -1,6 +1,5 @@
-use sqlx::{postgres::PgPoolOptions, PgPool};
-
 use crate::config;
+use sqlx::{postgres::PgPoolOptions, PgPool};
 
 #[derive(sqlx::FromRow, Debug)]
 pub struct Tables {
