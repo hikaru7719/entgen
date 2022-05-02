@@ -1,0 +1,6 @@
+#[derive(sqlx::FromRow, Debug)]
+pub struct {{ entity_name }} {
+{%- for field in fields %}
+    {{ field.field_name }}: {{ field.field_type }},
+{%- endfor %}
+}
