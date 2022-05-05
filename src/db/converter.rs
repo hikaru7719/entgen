@@ -6,12 +6,9 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "text" => "String",
         "timestamp" => "sqlx::types::chrono::NaiveDateTime",
         "boolean" => "bool",
-        "samllint" => "i16",
-        "integer" => "i32",
-        "bigint" => "i64",
-        "smallserial" => "i16",
-        "serial" => "i32",
-        "bigserial" => "i64",
+        "int2" => "i16",
+        "int4" => "i32",
+        "int8" => "i64",
         _ => "",
     }
 }

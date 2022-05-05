@@ -14,6 +14,10 @@ async fn main() -> Result<(), sqlx::Error> {
         id: Uuid::new_v4(),
         name: "testuser".to_string(),
         nickname: Some("test".to_string()),
+        created_at: sqlx::types::chrono::NaiveDateTime::new(
+            sqlx::types::chrono::NaiveDate::from_ymd(2022, 5, 5),
+            sqlx::types::chrono::NaiveTime::from_hms_milli(0, 0, 0, 0),
+        ),
     };
 
     insert(&pool, &user).await.unwrap();
@@ -27,10 +31,11 @@ async fn main() -> Result<(), sqlx::Error> {
 }
 
 async fn insert(pool: &PgPool, user: &Users) -> Result<(), sqlx::Error> {
-    sqlx::query("insert into users (id, name, nickname) values ($1, $2, $3)")
+    sqlx::query("insert into users (id, name, nickname, created_at) values ($1, $2, $3, $4)")
         .bind(user.id.clone())
         .bind(user.name.clone())
         .bind(user.nickname.as_ref())
+        .bind(user.created_at)
         .execute(pool)
         .await?;
     Ok(())
