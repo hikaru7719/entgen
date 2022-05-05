@@ -1,66 +1,24 @@
 # entgen
 
-# TODO
+Entgen is cli tool to generate entity for [sqlx](https://github.com/launchbadge/sqlx). This repository is work-in-progress. Stay tuned.
 
-## 準備
+## Usage
 
-- [x] docker-compose.ymlを準備する
+```:bash
+$ target/debug/entgen --help
+entgen 0.0.1
+Hikaru Miyahara
+Entity generator for sqlx
 
-## 入力
+USAGE:
+    entgen [OPTIONS]
 
-- [x] CLIのインターフェースを確定する
-- [x] CLIのライブラリを選定する
-- [x] 設定ファイルの形式を決定する
-    - ユーザーが定義する設定ファイルはTOML形式
-
-## モデル
-
-- [ ] 必要なデータ項目を洗い出す
-- [ ] 必要なデータを取得する
-- [x] information_schemaテーブルの項目を確認する
-- [x] information_schemaからデータを取得する
-- [x] 中間データ構造を確定する
-
-## information_schema
-
-ユーザ定義テーブル一覧
-
-```
-SELECT * FROM information_schema.tables WHERE table_schema = 'public';
+OPTIONS:
+    -f, --file <FILE>    Set entgen config file [default: entgen.toml]
+    -h, --help           Print help information
+    -V, --version        Print version information
 ```
 
-テーブルカラム情報一覧
+## Example
 
-```
-SELECT                                    
-    *
-FROM
-    information_schema.columns
-WHERE
-    table_name = $1
-ORDER BY
-    ordinal_position;
-```
-
-## 出力
-
-- [x] 出力のデータ構造を確定する
-    - [ ] sqlxのフォーマットに対応する
-    - [ ] uuidやtimestampなどに対応するRustのデータ型を確定する
-- [x] ファイル出力のためのテンプレートエンジンを検討する
-    - askamaを利用する
-- [ ] 多言語対応する
-    - [ ] Rustに対応する
-- [ ] 複数DBに対応する
-    - 標準SQLのデータ型に対応する
-    - PostgreSQL固有のデータ型に対応する
-    - MySQL固有のデータ型に対応する
-- [x] build.rsの仕様を確認する
-    - build.rsは利用しない方針
-
-## その他
-
-- [x] エラーハンドリングの方針を決定する
-- [ ] ログ出力の方針を決定する
-
-
+example is [here](https://github.com/hikaru7719/entgen/tree/main/examples/sqlx-postgres).

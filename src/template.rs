@@ -54,7 +54,7 @@ impl EntityTemplate {
 
     pub fn write(&self, output_dir: &String, body: String) -> Result<(), EntgenError> {
         let dir = Path::new(&output_dir);
-        let path = dir.join(format!("{}.generated.rs", self.entity_name));
+        let path = dir.join(format!("{}.rs", self.entity_name));
         let mut file: File;
 
         if dir.exists() && path.exists() {
@@ -90,7 +90,7 @@ mod test {
     #[test]
     fn test_build() {
         let template = EntityTemplate {
-            entity_name: "TestEntity".to_string(),
+            entity_name: "entity".to_string(),
             fields: vec![
                 Field {
                     field_name: "id".to_string(),
@@ -105,9 +105,9 @@ mod test {
         assert_eq!(
             template.build().unwrap(),
             r#"#[derive(sqlx::FromRow, Debug)]
-pub struct TestEntity {
-    id: sqlx::types::Uuid,
-    name: String,
+pub struct Entity {
+    pub id: sqlx::types::Uuid,
+    pub name: String,
 }
 "#
             .to_string()

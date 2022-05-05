@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: entgen-postgres
+    image: postgres:13.6
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
