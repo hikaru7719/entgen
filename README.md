@@ -1,6 +1,6 @@
 # entgen
 
-Entgen is cli tool to generate entity for [sqlx](https://github.com/launchbadge/sqlx). This repository is work-in-progress. Stay tuned.
+entgen is cli tool to generate entity for [sqlx](https://github.com/launchbadge/sqlx). This repository is work-in-progress. Stay tuned.
 
 ## Usage
 
@@ -21,4 +21,4 @@ OPTIONS:
 
 ## Example
 
-example is [here](https://github.com/hikaru7719/entgen/tree/main/examples/sqlx-postgres).
+Example is [here](https://github.com/hikaru7719/entgen/tree/main/examples/sqlx-postgres).
