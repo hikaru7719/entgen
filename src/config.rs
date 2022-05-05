@@ -1,7 +1,11 @@
 use serde_derive::Deserialize;
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    pub output_dir: String,
     pub postgres: PostgresConfig,
 }
 
@@ -21,21 +25,23 @@ pub enum ConfigError {
     EnvError(Box<dyn std::error::Error>),
 }
 
-pub fn new(path: String) -> Result<Config, ConfigError> {
-    return fs::read_to_string(path)
-        .or_else(|err| Err(ConfigError::FilePathError(Box::new(err))))
-        .and_then(|path| {
-            toml::from_str::<Config>(path.as_str())
-                .or_else(|err| Err(ConfigError::FileParseError(Box::new(err))))
-        });
-}
+impl Config {
+    pub fn new(path: PathBuf) -> Result<Config, ConfigError> {
+        return fs::read_to_string(path)
+            .or_else(|err| Err(ConfigError::FilePathError(Box::new(err))))
+            .and_then(|path| {
+                toml::from_str::<Config>(path.as_str())
+                    .or_else(|err| Err(ConfigError::FileParseError(Box::new(err))))
+            });
+    }
 
-pub fn new_postgres_config_for_test() -> Result<PostgresConfig, ConfigError> {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(".env");
-    dotenv::from_path(path).ok();
-    envy::prefixed("POSTGRES_")
-        .from_env::<PostgresConfig>()
-        .or_else(|err| Err(ConfigError::EnvError(Box::new(err))))
+    pub fn new_postgres_config_for_test() -> Result<PostgresConfig, ConfigError> {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(".env");
+        dotenv::from_path(path).ok();
+        envy::prefixed("POSTGRES_")
+            .from_env::<PostgresConfig>()
+            .or_else(|err| Err(ConfigError::EnvError(Box::new(err))))
+    }
 }
 
 #[cfg(test)]
@@ -43,7 +49,8 @@ mod test {
     use super::*;
     #[test]
     fn test_new() {
-        let config = new("test_config.toml".to_string()).unwrap();
+        let config = Config::new(PathBuf::from("test_config.toml")).unwrap();
+        assert_eq!(config.output_dir, "test".to_string());
         assert_eq!(config.postgres.user, "testuser".to_string());
         assert_eq!(config.postgres.password, "testpassword".to_string());
         assert_eq!(config.postgres.host, "testhost".to_string());
@@ -53,7 +60,7 @@ mod test {
 
     #[test]
     fn test_new_postgres_config_for_test() {
-        let config = new_postgres_config_for_test().unwrap();
+        let config = Config::new_postgres_config_for_test().unwrap();
         assert!(config.user != "".to_string());
         assert!(config.password != "".to_string());
         assert!(config.host != "".to_string());

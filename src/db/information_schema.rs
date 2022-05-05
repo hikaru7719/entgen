@@ -105,7 +105,7 @@ pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, DBE
 
 pub async fn fetch_column_definition(
     pool: &PgPool,
-    table_name: String,
+    table_name: &String,
 ) -> Result<Vec<Columns>, DBError> {
     sqlx::query_as::<_, Columns>(
         "SELECT * FROM information_schema.columns WHERE table_name = $1 ORDER BY ordinal_position",
@@ -122,7 +122,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connect() {
-        let config = config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test().unwrap();
         let pool = connect(config).await.unwrap();
         assert_eq!(pool.is_closed(), false);
         close(&pool).await;
@@ -131,7 +131,7 @@ mod test {
 
     #[tokio::test]
     async fn test_fetch_user_defined_tables() {
-        let config = config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test().unwrap();
         let pool = connect(config).await.unwrap();
         let tables = fetch_user_defined_tables(&pool).await.unwrap();
         assert_eq!(vec!["users"], tables);
@@ -139,9 +139,9 @@ mod test {
 
     #[tokio::test]
     async fn test_fetch_column_definition() {
-        let config = config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test().unwrap();
         let pool = connect(config).await.unwrap();
-        let definitions = fetch_column_definition(&pool, "users".to_string())
+        let definitions = fetch_column_definition(&pool, &"users".to_string())
             .await
             .unwrap();
         assert_eq!("id".to_string(), definitions[0].column_name);
