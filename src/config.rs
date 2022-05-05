@@ -1,8 +1,5 @@
 use serde_derive::Deserialize;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf};
 
 use crate::error::EntgenError;
 #[derive(Debug, Deserialize)]
@@ -30,12 +27,9 @@ impl Config {
             });
     }
 
-    pub fn new_postgres_config_for_test() -> Result<PostgresConfig, EntgenError> {
-        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(".env");
-        dotenv::from_path(path).ok();
-        envy::prefixed("POSTGRES_")
-            .from_env::<PostgresConfig>()
-            .or_else(|err| Err(EntgenError::ConfigEnvError(Box::new(err))))
+    pub fn new_postgres_config_for_test() -> PostgresConfig {
+        let config = Config::new(PathBuf::from("entgen.toml")).unwrap();
+        config.postgres
     }
 }
 
@@ -44,18 +38,18 @@ mod test {
     use super::*;
     #[test]
     fn test_new() {
-        let config = Config::new(PathBuf::from("test_config.toml")).unwrap();
+        let config = Config::new(PathBuf::from("entgen.toml")).unwrap();
         assert_eq!(config.output_dir, "test".to_string());
         assert_eq!(config.postgres.user, "testuser".to_string());
         assert_eq!(config.postgres.password, "testpassword".to_string());
-        assert_eq!(config.postgres.host, "testhost".to_string());
+        assert_eq!(config.postgres.host, "localhost".to_string());
         assert_eq!(config.postgres.port, 5432);
         assert_eq!(config.postgres.db, "testdb".to_string());
     }
 
     #[test]
     fn test_new_postgres_config_for_test() {
-        let config = Config::new_postgres_config_for_test().unwrap();
+        let config = Config::new_postgres_config_for_test();
         assert!(config.user != "".to_string());
         assert!(config.password != "".to_string());
         assert!(config.host != "".to_string());

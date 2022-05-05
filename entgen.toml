@@ -3,6 +3,6 @@ output_dir = "test"
 [postgres]
 user = "testuser"
 password = "testpassword"
-host = "testhost"
+host = "localhost"
 port = 5432
 db = "testdb"

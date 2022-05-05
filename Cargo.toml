@@ -1,6 +1,6 @@
 [package]
 name = "entgen"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,8 +11,6 @@ tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 serde_derive = "1.0"
 serde = "1.0"
-envy = "0.4"
-dotenv = "0.15.0"
 askama = "0.10"
 clap = { version = "3.1.15", features = ["derive"] }
 log = "0.4.0"

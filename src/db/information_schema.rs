@@ -118,7 +118,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connect() {
-        let config = config::Config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test();
         let pool = connect(&config).await.unwrap();
         assert_eq!(pool.is_closed(), false);
         close(&pool).await;
@@ -127,7 +127,7 @@ mod test {
 
     #[tokio::test]
     async fn test_fetch_user_defined_tables() {
-        let config = config::Config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test();
         let pool = connect(&config).await.unwrap();
         let tables = fetch_user_defined_tables(&pool).await.unwrap();
         assert_eq!(vec!["users"], tables);
@@ -135,7 +135,7 @@ mod test {
 
     #[tokio::test]
     async fn test_fetch_column_definition() {
-        let config = config::Config::new_postgres_config_for_test().unwrap();
+        let config = config::Config::new_postgres_config_for_test();
         let pool = connect(&config).await.unwrap();
         let definitions = fetch_column_definition(&pool, &"users".to_string())
             .await
