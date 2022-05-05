@@ -1,9 +1,17 @@
 pub fn convert_to_rs_type(db_type: &str) -> &str {
-    // TODO: 一旦varcharのみ対応
-    // 対応できる型を増やしていく
+    // TODO: 対応できる型を増やしていく
     match db_type {
         "uuid" => "sqlx::types::Uuid",
         "varchar" => "String",
+        "text" => "String",
+        "timestamp" => "sqlx::types::chrono::NaiveDateTime",
+        "boolean" => "bool",
+        "samllint" => "i16",
+        "integer" => "i32",
+        "bigint" => "i64",
+        "smallserial" => "i16",
+        "serial" => "i32",
+        "bigserial" => "i64",
         _ => "",
     }
 }
