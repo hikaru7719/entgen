@@ -1,4 +1,4 @@
-use crate::config;
+use crate::{config, error::EntgenError};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
 #[derive(sqlx::FromRow, Debug)]
@@ -65,13 +65,9 @@ pub struct Columns {
     pub is_updatable: String,
 }
 
-#[derive(Debug)]
-pub enum DBError {
-    ConnectionError(Box<dyn std::error::Error>),
-    QueryError(Box<dyn std::error::Error>),
-}
+pub type Pool = PgPool;
 
-pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> {
+pub async fn connect(config: &config::PostgresConfig) -> Result<Pool, EntgenError> {
     let db_url = format!(
         "postgres://{}:{}@{}:{}/{}",
         config.user, config.password, config.host, config.port, config.db
@@ -79,14 +75,14 @@ pub async fn connect(config: config::PostgresConfig) -> Result<PgPool, DBError> 
     PgPoolOptions::new()
         .connect(db_url.as_str())
         .await
-        .or_else(|err| Err(DBError::ConnectionError(err.into())))
+        .or_else(|err| Err(EntgenError::DBConnectionError(err.into())))
 }
 
-pub async fn close(pool: &PgPool) {
+pub async fn close(pool: &Pool) {
     pool.close().await;
 }
 
-pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, DBError> {
+pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, EntgenError> {
     let rs = sqlx::query_as::<_, Tables>(
         "SELECT * FROM information_schema.tables WHERE table_schema = 'public'",
     )
@@ -100,20 +96,20 @@ pub async fn fetch_user_defined_tables(pool: &PgPool) -> Result<Vec<String>, DBE
                 .map(|tbl| tbl.table_name.clone())
                 .collect::<Vec<String>>());
         })
-        .or_else(|err| Err(DBError::QueryError(err.into())));
+        .or_else(|err| Err(EntgenError::DBQueryError(err.into())));
 }
 
 pub async fn fetch_column_definition(
     pool: &PgPool,
     table_name: &String,
-) -> Result<Vec<Columns>, DBError> {
+) -> Result<Vec<Columns>, EntgenError> {
     sqlx::query_as::<_, Columns>(
         "SELECT * FROM information_schema.columns WHERE table_name = $1 ORDER BY ordinal_position",
     )
     .bind(table_name)
     .fetch_all(pool)
     .await
-    .or_else(|err| Err(DBError::QueryError(err.into())))
+    .or_else(|err| Err(EntgenError::DBQueryError(err.into())))
 }
 
 #[cfg(test)]
@@ -123,7 +119,7 @@ mod test {
     #[tokio::test]
     async fn test_connect() {
         let config = config::Config::new_postgres_config_for_test().unwrap();
-        let pool = connect(config).await.unwrap();
+        let pool = connect(&config).await.unwrap();
         assert_eq!(pool.is_closed(), false);
         close(&pool).await;
         assert_eq!(pool.is_closed(), true);
@@ -132,7 +128,7 @@ mod test {
     #[tokio::test]
     async fn test_fetch_user_defined_tables() {
         let config = config::Config::new_postgres_config_for_test().unwrap();
-        let pool = connect(config).await.unwrap();
+        let pool = connect(&config).await.unwrap();
         let tables = fetch_user_defined_tables(&pool).await.unwrap();
         assert_eq!(vec!["users"], tables);
     }
@@ -140,7 +136,7 @@ mod test {
     #[tokio::test]
     async fn test_fetch_column_definition() {
         let config = config::Config::new_postgres_config_for_test().unwrap();
-        let pool = connect(config).await.unwrap();
+        let pool = connect(&config).await.unwrap();
         let definitions = fetch_column_definition(&pool, &"users".to_string())
             .await
             .unwrap();

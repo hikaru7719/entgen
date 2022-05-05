@@ -1,3 +1,5 @@
+use crate::error::EntgenError;
+
 use super::db::{converter, information_schema};
 use askama::Template;
 use std::{
@@ -43,45 +45,38 @@ pub fn from(db_model: information_schema::Columns) -> Field {
     }
 }
 
-#[derive(Debug)]
-pub enum TemplateError {
-    BuildFailed(Box<dyn std::error::Error>),
-    FileOpenError(Box<dyn std::error::Error>),
-    FileWriteError(Box<dyn std::error::Error>),
-    DirCreateError(Box<dyn std::error::Error>),
-}
-
 impl EntityTemplate {
-    pub fn build(&self) -> Result<String, TemplateError> {
+    pub fn build(&self) -> Result<String, EntgenError> {
         self.render()
             .and_then(|s| Ok(format!("{}\n", s)))
-            .or_else(|err| Err(TemplateError::BuildFailed(err.into())))
+            .or_else(|err| Err(EntgenError::TemplateBuildFailed(err.into())))
     }
 
-    pub fn write(&self, output_dir: String, body: String) -> Result<(), TemplateError> {
+    pub fn write(&self, output_dir: &String, body: String) -> Result<(), EntgenError> {
         let dir = Path::new(&output_dir);
         let path = dir.join(format!("{}.generated.rs", self.entity_name));
         let mut file: File;
 
         if dir.exists() && path.exists() {
-            file =
-                File::open(path).or_else(|err| Err(TemplateError::FileOpenError(Box::new(err))))?;
+            file = File::open(path)
+                .or_else(|err| Err(EntgenError::TemplateFileOpenError(Box::new(err))))?;
         } else if dir.exists() {
             file = File::create(path)
-                .or_else(|err| Err(TemplateError::FileOpenError(Box::new(err))))?;
+                .or_else(|err| Err(EntgenError::TemplateFileOpenError(Box::new(err))))?;
         } else {
-            create_dir_all(dir).or_else(|err| Err(TemplateError::DirCreateError(Box::new(err))))?;
+            create_dir_all(dir)
+                .or_else(|err| Err(EntgenError::TemplateDirCreateError(Box::new(err))))?;
 
             file = File::create(path)
-                .or_else(|err| Err(TemplateError::FileOpenError(Box::new(err))))?;
+                .or_else(|err| Err(EntgenError::TemplateFileOpenError(Box::new(err))))?;
         }
 
         file.write(body.as_bytes())
-            .or_else(|err| Err(TemplateError::FileWriteError(Box::new(err))))?;
+            .or_else(|err| Err(EntgenError::TemplateFileWriteError(Box::new(err))))?;
         Ok(())
     }
 
-    pub fn build_and_write(&self, output_dir: String) -> Result<(), TemplateError> {
+    pub fn build_and_write(&self, output_dir: &String) -> Result<(), EntgenError> {
         let body = self.build()?;
         self.write(output_dir, body)?;
         Ok(())

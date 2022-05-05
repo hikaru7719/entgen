@@ -3,6 +3,8 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
+
+use crate::error::EntgenError;
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub output_dir: String,
@@ -18,29 +20,22 @@ pub struct PostgresConfig {
     pub db: String,
 }
 
-#[derive(Debug)]
-pub enum ConfigError {
-    FilePathError(Box<dyn std::error::Error>),
-    FileParseError(Box<dyn std::error::Error>),
-    EnvError(Box<dyn std::error::Error>),
-}
-
 impl Config {
-    pub fn new(path: PathBuf) -> Result<Config, ConfigError> {
+    pub fn new(path: PathBuf) -> Result<Config, EntgenError> {
         return fs::read_to_string(path)
-            .or_else(|err| Err(ConfigError::FilePathError(Box::new(err))))
+            .or_else(|err| Err(EntgenError::ConfigFilePathError(Box::new(err))))
             .and_then(|path| {
                 toml::from_str::<Config>(path.as_str())
-                    .or_else(|err| Err(ConfigError::FileParseError(Box::new(err))))
+                    .or_else(|err| Err(EntgenError::ConfigFileParseError(Box::new(err))))
             });
     }
 
-    pub fn new_postgres_config_for_test() -> Result<PostgresConfig, ConfigError> {
+    pub fn new_postgres_config_for_test() -> Result<PostgresConfig, EntgenError> {
         let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(".env");
         dotenv::from_path(path).ok();
         envy::prefixed("POSTGRES_")
             .from_env::<PostgresConfig>()
-            .or_else(|err| Err(ConfigError::EnvError(Box::new(err))))
+            .or_else(|err| Err(EntgenError::ConfigEnvError(Box::new(err))))
     }
 }
 
