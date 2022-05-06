@@ -4,6 +4,8 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "uuid" => "sqlx::types::Uuid",
         "varchar" => "String",
         "text" => "String",
+        "bpchar" => "String",
+        "name" => "String",
         "timestamp" => "sqlx::types::chrono::NaiveDateTime",
         "boolean" => "bool",
         "int2" => "i16",

@@ -18,3 +18,10 @@ CREATE TABLE nums (
     jjj numeric NOT NULL
 );
 
+CREATE TABLE strs (
+    aaa char(5) NOT NULL,
+    bbb varchar(5) NOT NULL,
+    ccc text NOT NULL,
+    ddd name NOT NULL,
+    eee char NOT NULL
+)
