@@ -6,4 +6,8 @@ pub struct Nums {
     pub ddd: i16,
     pub eee: i32,
     pub fff: i64,
+    pub ggg: f32,
+    pub hhh: f64,
+    pub iii: sqlx::types::Decimal,
+    pub jjj: sqlx::types::Decimal,
 }

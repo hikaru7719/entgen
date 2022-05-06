@@ -9,6 +9,9 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "int2" => "i16",
         "int4" => "i32",
         "int8" => "i64",
+        "float4" => "f32",
+        "float8" => "f64",
+        "numeric" => "sqlx::types::Decimal",
         _ => "",
     }
 }

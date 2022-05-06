@@ -11,6 +11,10 @@ CREATE TABLE nums (
     ccc bigint NOT NULL,
     ddd smallserial NOT NULL,
     eee serial NOT NULL,
-    fff bigserial NOT NULL
+    fff bigserial NOT NULL,
+    ggg real NOT NULL,
+    hhh double precision NOT NULL,
+    iii decimal NOT NULL,
+    jjj numeric NOT NULL
 );
 

@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sqlx = { version = "0.5", features = [ "runtime-tokio-native-tls" , "postgres", "uuid", "chrono"] }
+sqlx = { version = "0.5", features = [ "runtime-tokio-native-tls" , "postgres", "uuid", "chrono", "decimal"] }
 tokio = { version = "1", features = ["full"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
