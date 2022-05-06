@@ -24,4 +24,8 @@ CREATE TABLE strs (
     ccc text NOT NULL,
     ddd name NOT NULL,
     eee char NOT NULL
-)
+);
+
+CREATE TABLE bools (
+    aaa boolean NOT NULL
+);

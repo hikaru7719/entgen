@@ -7,7 +7,7 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "bpchar" => "String",
         "name" => "String",
         "timestamp" => "sqlx::types::chrono::NaiveDateTime",
-        "boolean" => "bool",
+        "bool" => "bool",
         "int2" => "i16",
         "int4" => "i32",
         "int8" => "i64",
