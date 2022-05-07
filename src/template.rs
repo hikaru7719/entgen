@@ -19,6 +19,7 @@ pub struct EntityTemplate {
 pub struct Field {
     field_name: String,
     field_type: String,
+    nullable: bool,
 }
 
 pub fn from_vec(
@@ -37,11 +38,12 @@ pub fn from_vec(
 
 pub fn from(db_model: information_schema::Columns) -> Field {
     let field_name = db_model.column_name.clone();
-    let field_type =
-        converter::convert_to_field_type(db_model.udt_name.as_str(), db_model.is_nullable.as_str());
+    let field_type = converter::convert_to_rs_type(db_model.udt_name.as_str()).to_string();
+    let nullable = converter::convert_to_bool(db_model.is_nullable.as_str());
     Field {
         field_name: field_name,
         field_type: field_type,
+        nullable: nullable,
     }
 }
 
@@ -95,10 +97,17 @@ mod test {
                 Field {
                     field_name: "id".to_string(),
                     field_type: "sqlx::types::Uuid".to_string(),
+                    nullable: false,
                 },
                 Field {
                     field_name: "name".to_string(),
                     field_type: "String".to_string(),
+                    nullable: false,
+                },
+                Field {
+                    field_name: "nickname".to_string(),
+                    field_type: "String".to_string(),
+                    nullable: true,
                 },
             ],
         };
@@ -108,6 +117,7 @@ mod test {
 pub struct Entity {
     pub id: sqlx::types::Uuid,
     pub name: String,
+    pub nickname: Option<String>,
 }
 "#
             .to_string()

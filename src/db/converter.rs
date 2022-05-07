@@ -18,13 +18,12 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
     }
 }
 
-pub fn convert_to_field_type(db_type: &str, nullable: &str) -> String {
-    let rs_type = convert_to_rs_type(db_type);
+pub fn convert_to_bool(nullable: &str) -> bool {
     if nullable == "YES" {
-        format!("Option<{}>", rs_type)
+        true
     } else if nullable == "No" {
-        rs_type.to_string()
+        false
     } else {
-        rs_type.to_string()
+        false
     }
 }

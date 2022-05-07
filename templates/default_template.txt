@@ -1,6 +1,6 @@
 #[derive(sqlx::FromRow, Debug)]
 pub struct {{ entity_name|capitalize }} {
 {%- for field in fields %}
-    pub {{ field.field_name }}: {{ field.field_type }},
+    pub {{ field.field_name }}: {% if field.nullable == false %}{{ field.field_type }}{% else %}Option<{{ field.field_type }}>{% endif %},
 {%- endfor %}
 }
