@@ -42,8 +42,14 @@ async fn generate(
 
     for table_name in tables.iter() {
         let columns = db::information_schema::fetch_column_definition(&pool, table_name).await?;
-        let template = template::entity::from_vec(table_name, columns);
-        template.build_and_write(&config.output_dir)?;
+        let entity_template = template::entity::from_vec(table_name, &columns);
+        let repository_template = template::repository::from_vec(table_name, &columns);
+        let body = format!(
+            "{}\n{}",
+            entity_template.build()?,
+            repository_template.build()?
+        );
+        template::writer::write(&config.output_dir, table_name, &body)?;
     }
     Ok(())
 }

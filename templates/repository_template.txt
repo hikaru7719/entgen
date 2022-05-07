@@ -1,0 +1,28 @@
+use std::ops::Deref;
+use std::sync::Arc;
+
+pub struct {{ entity_name|capitalize }}Repository {
+    pool: Arc<sqlx::PgPool>,
+}
+
+impl {{ entity_name|capitalize }}Repository {
+    fn new(pool: Arc<sqlx::PgPool>) -> Self {
+        {{ entity_name|capitalize }}Repository { pool: pool }
+    }
+
+    async fn insert(&self, {{ entity_name }}: &{{ entity_name|capitalize }}) -> Result<(), sqlx::Error> {
+        sqlx::query("INSERT INTO {{ entity_name }} ({%- for field in fields %}{% if loop.first %}{{ field.field_name }}{% else %}, {{ field.field_name }}{% endif %}{%- endfor %}) VALUES ({%- for field in fields %}{% if loop.first %}${{ loop.index }}{% else %}, ${{ loop.index }}{% endif %}{%- endfor %})")
+{%- for field in fields %}
+            .bind({{ entity_name }}.{{ field.field_name }}{% if field.nullable == true %}.as_ref(){% else if field.field_type == "String".to_string() %}.clone(){% endif %})
+{%- endfor %}
+            .execute(self.pool.deref())
+            .await?;
+        Ok(())
+    }
+
+    async fn find_all(&self) -> Result<Vec<{{ entity_name|capitalize }}>, sqlx::Error> {
+        Ok(sqlx::query_as::<_, {{ entity_name|capitalize }}>("SELECT * FROM {{ entity_name }}")
+            .fetch_all(self.pool.deref())
+            .await?)
+    }
+}
