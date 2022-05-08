@@ -14,11 +14,11 @@ pub struct UsersRepository {
 }
 
 impl UsersRepository {
-    fn new(pool: Arc<sqlx::PgPool>) -> Self {
+    pub fn new(pool: Arc<sqlx::PgPool>) -> Self {
         UsersRepository { pool: pool }
     }
 
-    async fn insert(&self, users: &Users) -> Result<(), sqlx::Error> {
+    pub async fn insert(&self, users: &Users) -> Result<(), sqlx::Error> {
         sqlx::query("INSERT INTO users (id, name, nickname, created_at) VALUES ($1, $2, $3, $4)")
             .bind(users.id)
             .bind(users.name.clone())
@@ -29,7 +29,7 @@ impl UsersRepository {
         Ok(())
     }
 
-    async fn find_all(&self) -> Result<Vec<Users>, sqlx::Error> {
+    pub async fn find_all(&self) -> Result<Vec<Users>, sqlx::Error> {
         Ok(sqlx::query_as::<_, Users>("SELECT * FROM users")
             .fetch_all(self.pool.deref())
             .await?)

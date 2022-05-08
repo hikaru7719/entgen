@@ -11,11 +11,11 @@ pub struct BoolsRepository {
 }
 
 impl BoolsRepository {
-    fn new(pool: Arc<sqlx::PgPool>) -> Self {
+    pub fn new(pool: Arc<sqlx::PgPool>) -> Self {
         BoolsRepository { pool: pool }
     }
 
-    async fn insert(&self, bools: &Bools) -> Result<(), sqlx::Error> {
+    pub async fn insert(&self, bools: &Bools) -> Result<(), sqlx::Error> {
         sqlx::query("INSERT INTO bools (aaa) VALUES ($1)")
             .bind(bools.aaa)
             .execute(self.pool.deref())
@@ -23,7 +23,7 @@ impl BoolsRepository {
         Ok(())
     }
 
-    async fn find_all(&self) -> Result<Vec<Bools>, sqlx::Error> {
+    pub async fn find_all(&self) -> Result<Vec<Bools>, sqlx::Error> {
         Ok(sqlx::query_as::<_, Bools>("SELECT * FROM bools")
             .fetch_all(self.pool.deref())
             .await?)

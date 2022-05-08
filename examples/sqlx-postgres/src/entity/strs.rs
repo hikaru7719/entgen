@@ -15,11 +15,11 @@ pub struct StrsRepository {
 }
 
 impl StrsRepository {
-    fn new(pool: Arc<sqlx::PgPool>) -> Self {
+    pub fn new(pool: Arc<sqlx::PgPool>) -> Self {
         StrsRepository { pool: pool }
     }
 
-    async fn insert(&self, strs: &Strs) -> Result<(), sqlx::Error> {
+    pub async fn insert(&self, strs: &Strs) -> Result<(), sqlx::Error> {
         sqlx::query("INSERT INTO strs (aaa, bbb, ccc, ddd, eee) VALUES ($1, $2, $3, $4, $5)")
             .bind(strs.aaa.clone())
             .bind(strs.bbb.clone())
@@ -31,7 +31,7 @@ impl StrsRepository {
         Ok(())
     }
 
-    async fn find_all(&self) -> Result<Vec<Strs>, sqlx::Error> {
+    pub async fn find_all(&self) -> Result<Vec<Strs>, sqlx::Error> {
         Ok(sqlx::query_as::<_, Strs>("SELECT * FROM strs")
             .fetch_all(self.pool.deref())
             .await?)

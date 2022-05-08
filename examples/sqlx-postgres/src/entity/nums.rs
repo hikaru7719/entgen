@@ -20,11 +20,11 @@ pub struct NumsRepository {
 }
 
 impl NumsRepository {
-    fn new(pool: Arc<sqlx::PgPool>) -> Self {
+    pub fn new(pool: Arc<sqlx::PgPool>) -> Self {
         NumsRepository { pool: pool }
     }
 
-    async fn insert(&self, nums: &Nums) -> Result<(), sqlx::Error> {
+    pub async fn insert(&self, nums: &Nums) -> Result<(), sqlx::Error> {
         sqlx::query("INSERT INTO nums (aaa, bbb, ccc, ddd, eee, fff, ggg, hhh, iii, jjj) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)")
             .bind(nums.aaa)
             .bind(nums.bbb)
@@ -41,7 +41,7 @@ impl NumsRepository {
         Ok(())
     }
 
-    async fn find_all(&self) -> Result<Vec<Nums>, sqlx::Error> {
+    pub async fn find_all(&self) -> Result<Vec<Nums>, sqlx::Error> {
         Ok(sqlx::query_as::<_, Nums>("SELECT * FROM nums")
             .fetch_all(self.pool.deref())
             .await?)
