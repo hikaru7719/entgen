@@ -4,7 +4,7 @@ entgen is cli tool to generate entity and repository for [sqlx](https://github.c
 
 ## Usage
 
-```:bash
+```bash
 $ target/debug/entgen --help
 entgen 0.0.1
 Hikaru Miyahara
@@ -24,7 +24,7 @@ OPTIONS:
 You must define entgen.toml file if you use entgen cli.
 Config file format is below.
 
-```:toml
+```toml
 output_dir = "src/entity"
 
 [postgres]
@@ -39,7 +39,7 @@ db = "testdb"
 
 At first, you must define db model.
 
-```:sql
+```sql
 CREATE TABLE users (
     id uuid PRIMARY KEY,
     name varchar(255) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE users (
 
 If you ware defined db model like above, you can get Rust model to use cli.
 
-```:rs
+```rs
 #[derive(sqlx::FromRow, Debug)]
 pub struct Users {
     pub id: sqlx::types::Uuid,
