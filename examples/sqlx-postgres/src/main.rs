@@ -3,7 +3,7 @@ mod entity;
 use std::{str::FromStr, sync::Arc};
 
 use entity::{nums::Nums, users::Users};
-use sqlx::{postgres::PgPoolOptions, types::Uuid, PgPool};
+use sqlx::{postgres::PgPoolOptions, types::Uuid};
 
 use crate::entity::{nums::NumsRepository, users::UsersRepository};
 
