@@ -88,7 +88,6 @@ impl UsersRepository {
             .await?)
     }
 
-    
     pub async fn find_by_id(&self, id: &sqlx::types::Uuid) -> Result<Users, sqlx::Error> {
         Ok(
             sqlx::query_as::<_, Users>("SELECT * FROM users WHERE id = $1")
