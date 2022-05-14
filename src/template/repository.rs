@@ -134,6 +134,15 @@ impl UsersRepository {
             .await?)
     }
 
+    pub async fn find_by_id(&self, id: &sqlx::types::Uuid) -> Result<Users, sqlx::Error> {
+        Ok(
+            sqlx::query_as::<_, Users>("SELECT * FROM users WHERE id = $1")
+                .bind(id)
+                .fetch_one(self.pool.deref())
+                .await?,
+        )
+    }
+
     pub async fn delete(&self, id: &sqlx::types::Uuid) -> Result<(), sqlx::Error> {
         sqlx::query("DELETE FROM users WHERE id = $1")
             .bind(id)
