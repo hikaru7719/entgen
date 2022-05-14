@@ -65,6 +65,12 @@ pub struct Columns {
     pub is_updatable: String,
 }
 
+#[derive(sqlx::FromRow, Debug)]
+pub struct PrimaryKey {
+    pub table_name: String,
+    pub column_name: String,
+}
+
 pub type Pool = PgPool;
 
 pub async fn connect(config: &config::PostgresConfig) -> Result<Pool, EntgenError> {
@@ -112,6 +118,24 @@ pub async fn fetch_column_definition(
     .or_else(|err| Err(EntgenError::DBQueryError(err.into())))
 }
 
+pub async fn fetch_column_primary_key(
+    pool: &PgPool,
+    table_name: &String,
+) -> Result<PrimaryKey, EntgenError> {
+    sqlx::query_as::<_, PrimaryKey>(
+        r#"
+    SELECT ccu.table_name, ccu.column_name FROM information_schema.constraint_column_usage AS ccu
+    INNER JOIN information_schema.table_constraints AS tc
+    ON ccu.table_name = tc.table_name AND ccu.constraint_name = tc.constraint_name
+    WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_name = $1
+    "#,
+    )
+    .bind(table_name)
+    .fetch_one(pool)
+    .await
+    .or_else(|err| Err(EntgenError::DBQueryError(err.into())))
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -141,5 +165,17 @@ mod test {
             .await
             .unwrap();
         assert_eq!("id".to_string(), definitions[0].column_name);
+    }
+
+    #[tokio::test]
+    async fn test_fetch_primary_key_() {
+        let config = config::Config::new_postgres_config_for_test();
+        let pool = connect(&config).await.unwrap();
+        let primary_key = fetch_column_primary_key(&pool, &"users".to_string())
+            .await
+            .unwrap();
+
+        assert_eq!("users".to_string(), primary_key.table_name);
+        assert_eq!("id".to_string(), primary_key.column_name);
     }
 }
