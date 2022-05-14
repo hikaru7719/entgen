@@ -118,10 +118,10 @@ pub async fn fetch_column_definition(
     .or_else(|err| Err(EntgenError::DBQueryError(err.into())))
 }
 
-pub async fn fetch_column_primary_key(
+pub async fn fetch_primary_key(
     pool: &PgPool,
     table_name: &String,
-) -> Result<PrimaryKey, EntgenError> {
+) -> Result<Option<PrimaryKey>, EntgenError> {
     sqlx::query_as::<_, PrimaryKey>(
         r#"
     SELECT ccu.table_name, ccu.column_name FROM information_schema.constraint_column_usage AS ccu
@@ -131,7 +131,7 @@ pub async fn fetch_column_primary_key(
     "#,
     )
     .bind(table_name)
-    .fetch_one(pool)
+    .fetch_optional(pool)
     .await
     .or_else(|err| Err(EntgenError::DBQueryError(err.into())))
 }
@@ -168,14 +168,23 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_fetch_primary_key_() {
+    async fn test_fetch_primary_key() {
         let config = config::Config::new_postgres_config_for_test();
         let pool = connect(&config).await.unwrap();
-        let primary_key = fetch_column_primary_key(&pool, &"users".to_string())
+        let primary_key = fetch_primary_key(&pool, &"users".to_string())
             .await
+            .unwrap()
             .unwrap();
 
         assert_eq!("users".to_string(), primary_key.table_name);
         assert_eq!("id".to_string(), primary_key.column_name);
+    }
+
+    #[tokio::test]
+    async fn test_fetch_primary_when_primary_key_does_not_exists() {
+        let config = config::Config::new_postgres_config_for_test();
+        let pool = connect(&config).await.unwrap();
+        let primary_key = fetch_primary_key(&pool, &"nums".to_string()).await.unwrap();
+        assert!(primary_key.is_none())
     }
 }

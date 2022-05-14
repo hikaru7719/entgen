@@ -28,29 +28,44 @@ pub struct PrimaryKey {
 pub fn from_vec(
     table_name: &String,
     db_models: &Vec<information_schema::Columns>,
-    pk: &information_schema::PrimaryKey,
+    pk: &Option<information_schema::PrimaryKey>,
 ) -> RepositoryTemplate {
     let fields: Vec<Field> = db_models.iter().map(|db_model| from(db_model)).collect();
-    let primary_key = fields
-        .iter()
-        .filter(|f| *f.field_name == pk.column_name)
-        .nth(0)
-        .map_or(
-            PrimaryKey {
-                field_name: "".to_string(),
-                field_type: "".to_string(),
-                is_null: true,
-            },
-            |f| PrimaryKey {
-                field_name: f.field_name.clone(),
-                field_type: f.field_type.clone(),
-                is_null: false,
-            },
-        );
-    RepositoryTemplate {
-        entity_name: table_name.clone(),
-        fields: fields,
-        primary_key: primary_key,
+    match pk {
+        Some(p) => {
+            let primary_key = fields
+                .iter()
+                .filter(|f| *f.field_name == p.column_name)
+                .nth(0)
+                .map_or(
+                    PrimaryKey {
+                        field_name: "".to_string(),
+                        field_type: "".to_string(),
+                        is_null: true,
+                    },
+                    |f| PrimaryKey {
+                        field_name: f.field_name.clone(),
+                        field_type: f.field_type.clone(),
+                        is_null: false,
+                    },
+                );
+            return RepositoryTemplate {
+                entity_name: table_name.clone(),
+                fields: fields,
+                primary_key: primary_key,
+            };
+        }
+        None => {
+            return RepositoryTemplate {
+                entity_name: table_name.clone(),
+                fields: fields,
+                primary_key: PrimaryKey {
+                    field_name: "".to_string(),
+                    field_type: "".to_string(),
+                    is_null: true,
+                },
+            }
+        }
     }
 }
 

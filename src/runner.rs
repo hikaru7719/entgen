@@ -42,7 +42,7 @@ async fn generate(
 
     for table_name in tables.iter() {
         let columns = db::information_schema::fetch_column_definition(&pool, table_name).await?;
-        let pk = db::information_schema::fetch_column_primary_key(&pool, table_name).await?;
+        let pk = db::information_schema::fetch_primary_key(&pool, table_name).await?;
         let entity_template = template::entity::from_vec(table_name, &columns);
         let repository_template = template::repository::from_vec(table_name, &columns, &pk);
         let body = format!(
