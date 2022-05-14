@@ -34,7 +34,7 @@ pub fn from_vec(
     let primary_key = fields
         .iter()
         .filter(|f| *f.field_name == pk.column_name)
-        .nth(1)
+        .nth(0)
         .map_or(
             PrimaryKey {
                 field_name: "".to_string(),
