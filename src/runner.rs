@@ -5,6 +5,7 @@ use log::LevelFilter;
 extern crate log;
 
 pub async fn run() {
+    env_logger::builder().filter_level(LevelFilter::Info).init();
     if let Err(err) = run_with_result().await {
         log_and_exit(err);
     }
@@ -17,7 +18,6 @@ fn log_and_exit(err: EntgenError) {
 }
 
 async fn run_with_result() -> Result<(), EntgenError> {
-    env_logger::builder().filter_level(LevelFilter::Info);
     let cli = cli::Cli::parse_opt();
     let config = config::Config::new(cli.file)?;
 
