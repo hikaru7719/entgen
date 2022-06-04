@@ -1,3 +1,5 @@
+use log::error;
+
 pub fn convert_to_rs_type(db_type: &str) -> &str {
     // TODO: 対応できる型を増やしていく
     match db_type {
@@ -16,7 +18,10 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "date" => "sqlx::types::chrono::Date",
         "time" => "sqlx::types::chrono::Time",
         "timetz" => "sqlx::postgres::types::PgTimeTz",
-        _ => "",
+        _ => {
+            error!("{} is not suported", db_type);
+            ""
+        }
     }
 }
 
