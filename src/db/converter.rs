@@ -2,11 +2,7 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
     // TODO: 対応できる型を増やしていく
     match db_type {
         "uuid" => "sqlx::types::Uuid",
-        "varchar" => "String",
-        "text" => "String",
-        "bpchar" => "String",
-        "name" => "String",
-        "timestamp" => "sqlx::types::chrono::NaiveDateTime",
+        "varchar" | "test" | "bpchar" | "name" => "String",
         "bool" => "bool",
         "int2" => "i16",
         "int4" => "i32",
@@ -14,6 +10,12 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
         "float4" => "f32",
         "float8" => "f64",
         "numeric" => "sqlx::types::Decimal",
+        "bytea" => "Vec<u8>",
+        "timestamp" => "sqlx::types::chrono::NaiveDateTime",
+        "timestamptz" => "sqlx::types::chrono::DateTime<Utc>",
+        "date" => "sqlx::types::chrono::Date",
+        "time" => "sqlx::types::chrono::Time",
+        "timetz" => "sqlx::postgres::types::PgTimeTz",
         _ => "",
     }
 }

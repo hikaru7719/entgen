@@ -29,3 +29,11 @@ CREATE TABLE strs (
 CREATE TABLE bools (
     aaa boolean NOT NULL
 );
+
+CREATE TABLE times (
+    aaa date NOT NULL,
+    bbb timestamp with time zone NOT NULL,
+    ccc timestamp NOT NULL,
+    ddd time NOT NULL,
+    eee time with time zone NOT NULL
+);
