@@ -154,7 +154,7 @@ mod test {
         let config = config::Config::new_postgres_config_for_test();
         let pool = connect(&config).await.unwrap();
         let tables = fetch_user_defined_tables(&pool).await.unwrap();
-        assert_eq!(vec!["users", "nums", "strs", "bools"], tables);
+        assert_eq!(vec!["users", "nums", "strs", "bools", "times"], tables);
     }
 
     #[tokio::test]
