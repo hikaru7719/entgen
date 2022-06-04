@@ -10,14 +10,13 @@ pub fn write(output_dir: &String, name: &String, body: &String) -> Result<(), En
             .or_else(|err| Err(EntgenError::TemplateDirCreateError(Box::new(err))))?;
     }
 
-    let path = dir.join(format!("{}.rs", name));
-    let mut file = File::options()
+    File::options()
         .create(true)
         .write(true)
-        .open(path)
-        .or_else(|err| Err(EntgenError::TemplateFileOpenError(Box::new(err))))?;
-
-    file.write(body.as_bytes())
+        .open(dir.join(format!("{}.rs", name)))
+        .or_else(|err| Err(EntgenError::TemplateFileOpenError(Box::new(err))))?
+        .write(body.as_bytes())
         .or_else(|err| Err(EntgenError::TemplateFileWriteError(Box::new(err))))?;
+
     Ok(())
 }
