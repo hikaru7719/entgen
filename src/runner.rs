@@ -1,6 +1,6 @@
 use super::*;
 use crate::error::EntgenError;
-use log::LevelFilter;
+use log::{info, LevelFilter};
 
 extern crate log;
 
@@ -52,5 +52,15 @@ async fn generate(
         );
         template::writer::write(&config.output_dir, table_name, &body)?;
     }
+
+    let declaration = tables
+        .into_iter()
+        .map(|mod_name| format!("pub mod {};", mod_name))
+        .collect::<Vec<String>>()
+        .join("\n");
+    info!(
+        "add following lines to the module declaration\n{}",
+        declaration
+    );
     Ok(())
 }
