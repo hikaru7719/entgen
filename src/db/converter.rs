@@ -2,7 +2,7 @@ pub fn convert_to_rs_type(db_type: &str) -> &str {
     // TODO: 対応できる型を増やしていく
     match db_type {
         "uuid" => "sqlx::types::Uuid",
-        "varchar" | "test" | "bpchar" | "name" => "String",
+        "varchar" | "text" | "bpchar" | "name" => "String",
         "bool" => "bool",
         "int2" => "i16",
         "int4" => "i32",
