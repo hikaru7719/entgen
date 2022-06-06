@@ -2,8 +2,19 @@
 name = "entgen"
 version = "0.0.1"
 edition = "2021"
+description = "entity and repository generator for sqlx"
+repository = "https://github.com/hikaru7719/entgen"
+exclude = [
+    "docker-compose.yml",
+    "entgen.toml",
+    "examples/*",
+    "db/*",
+]
+categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "entgen"
+path = "src/main.rs"
 
 [dependencies]
 sqlx = { version = "0.5", features = [ "runtime-tokio-native-tls" , "postgres", "uuid" ] }

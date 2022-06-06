@@ -28,11 +28,11 @@ Config file format is below.
 output_dir = "src/entity"
 
 [postgres]
-user = "testuser"
-password = "testpassword"
-host = "localhost"
-port = 5432
-db = "testdb"
+user = "<user>"
+password = "<password>"
+host = "<host>"
+port = <port>
+db = "<db>"
 ```
 
 ## DB model and Rust implementation
